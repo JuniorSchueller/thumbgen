@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thumbgen</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ffmpeg.js/0.10.1/ffmpeg.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+        }
+        h1 {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        input, textarea, button {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            margin: 10px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        input, textarea {
+            width: 80%;
+            max-width: 400px;
+        }
+        textarea {
+            height: 80px;
+        }
+        button {
+            background: #ff7eb3;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #ff4f91;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        img {
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+        img:hover {
+            transform: scale(1.02);
+        }
+        a {
+            color: white;
+            /*text-decoration: none;*/
+        }
+    </style>
+</head>
+<body>
+    <h1>thumbgen<br>made by <a href="https://github.com/JuniorSchueller/thumbgen">JuniorSchueller</a></h1>
+    <input type="file" id="videoInput" accept="video/mp4"><br><br>
+    <textarea id="textOverlay" placeholder="TEXTO DA CAPA"></textarea><br><br>
+    <button onclick="generateCover()">GERAR CAPA</button><br><br>
+    <canvas id="canvas"></canvas>
+    <img id="outputImage" alt="Generated Cover">
+
+    <script>
+        function generateCover() {
+            const videoInput = document.getElementById('videoInput').files[0];
+            if (!videoInput) {
+                alert("Selecione um vídeo primeiro!");
+                return;
+            }
+            
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(videoInput);
+            video.crossOrigin = "anonymous";
+            video.load();
+            
+            video.onloadedmetadata = function () {
+                const randomTime = Math.random() * video.duration;
+                video.currentTime = randomTime;
+            };
+            
+            video.onseeked = function () {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const textOverlay = document.getElementById('textOverlay').value;
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "white";
+                ctx.fillText(textOverlay, 20, 40);
+                
+                const outputImage = document.getElementById('outputImage');
+                outputImage.src = canvas.toDataURL('image/png');
+            };
+        }
+    </script>
+</body>
+</html>
